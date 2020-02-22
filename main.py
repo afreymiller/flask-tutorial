@@ -10,19 +10,23 @@ app = Flask(__name__)
 
 # env FLASK_APP=main.py flask run
 
-
 @app.route('/')
 def index():
     return 'Index Page'
 
-@app.route('/reviews/<lender>/<int:number>')
-def get_reviews(lender, number):
+def construct_url(lender, number):
     URL_PREFIX = "https://www.lendingtree.com/reviews/personal/"
     URL_PREFIX += lender
     URL_PREFIX += "/"
     URL_PREFIX += str(number)
     URL_PREFIX += "?OverallRating=1&pid=1"
-    response = requests.get(URL_PREFIX)
+    return URL_PREFIX
+
+def get_reviews_object(lender, number):
+    
+    url = construct_url(lender, number)
+
+    response = requests.get(url)
 
     soup = BeautifulSoup(response.content, 'html.parser')   
 
@@ -51,6 +55,13 @@ def get_reviews(lender, number):
         obj['date'] = date.contents[0].strip()
 
         objects.append(obj)
+
+    return objects
+
+@app.route('/reviews/<lender>/<int:number>')
+def get_reviews(lender, number):
+    
+    objects = get_reviews_object(lender, number)
     
     return jsonify(reviews=objects)
 
