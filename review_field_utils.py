@@ -26,7 +26,7 @@ def populate_review_fields(review):
 
     return obj
 
-def construct_url(lender, review_id):
+def construct_url(lender, review_id, star_rating, page):
     try:
         id_as_int = int(review_id)
 
@@ -42,7 +42,7 @@ def construct_url(lender, review_id):
         full_url = URL_PREFIX + lender
         full_url += "/"
         full_url += str(review_id)
-        full_url += "?OverallRating=1&pid=1"
+        full_url += f'?OverallRating={star_rating}&pid={page}'
         return full_url
 
     except ValueError:
