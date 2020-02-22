@@ -23,22 +23,27 @@ def construct_url(lender, number):
     return URL_PREFIX
 
 def populate_review_fields(review):
-    review_text = review.select(".reviewText")     
-    review_title = review.select(".reviewTitle") 
-    reviewer_name = review.select(".consumerName")
-    review_date = review.select(".consumerReviewDate")
+    field_dependencies = [{
+            "selector": ".reviewText",
+            "key": "value"
+        }, {
+            "selector": ".reviewTitle",
+            "key": "title"
+        }, {
+            "selector": ".consumerName",
+            "key": "name"
+        }, {
+            "selector": ".consumerReviewDate",
+            "key": "date"
+        }
+    ]
 
     obj = {}
-  
-    value = review_text[0]  
-    title = review_title[0]     
-    name = reviewer_name[0]
-    date = review_date[0]
 
-    obj['value'] = value.contents[0].strip()
-    obj['title'] = title.contents[0].strip()
-    obj['name'] = name.contents[0].strip()
-    obj['date'] = date.contents[0].strip()
+    for field in field_dependencies: 
+        element = review.select(field['selector'])
+        value = element[0]
+        obj[field['key']] = value.contents[0].strip()
 
     return obj
 
@@ -63,17 +68,3 @@ def get_reviews(lender, number):
     objects = get_reviews_object(lender, number)
     
     return jsonify(reviews=objects)
-
-@app.route('/dummy/<username>/<int:number>')
-def get_nested(username, number):
-    return 'User %s' % escape(username)
-
-@app.route('/post/<int:post_id>')
-def show_post(post_id):
-    # show the post with the given id, the id is an integer
-    return 'Post %d' % post_id
-
-@app.route('/path/<path:subpath>')
-def show_subpath(subpath):
-    # show the subpath after /path/
-    return 'Subpath %s' % escape(subpath)
