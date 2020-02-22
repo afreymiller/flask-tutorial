@@ -26,17 +26,22 @@ def populate_review_fields(review):
 
     return obj
 
-def construct_url(lender, number):
+def construct_url(lender, review_id):
     try:
-        number_as_int = int(number)
+        id_as_int = int(review_id)
+        lender = lender.strip()
+
         URL_PREFIX = "https://www.lendingtree.com/reviews/personal/"
         full_url = URL_PREFIX + lender
         full_url += "/"
-        full_url += str(number)
+        full_url += str(review_id)
         full_url += "?OverallRating=1&pid=1"
         return full_url
-    except:
-        raise Exception("Input for number should be an int")    
+        
+    except ValueError:
+        raise ValueError("Input for review_id should be an integer")
+    except AttributeError:
+        raise AttributeError("Input for lender should be a non-null string")
 
 def parse_response_for_reviews(response):
     soup = BeautifulSoup(response.content, 'html.parser')   

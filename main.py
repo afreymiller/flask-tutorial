@@ -16,10 +16,16 @@ def index():
 def execute_request(url):
     return requests.get(url)
 
-@app.route('/reviews/<lender>/<int:number>')
-def get_reviews(lender, number):
-    url = construct_url(lender, number)
-    response = requests.get(url)
-    objects = parse_response_for_reviews(response)
+@app.route('/reviews/<lender>/<int:review_id>')
+def get_reviews(lender, review_id):
+    try: 
+        url = construct_url(lender, review_id)
+        response = requests.get(url)
+
+        objects = parse_response_for_reviews(response)
     
-    return jsonify(reviews=objects)
+        return jsonify(reviews=objects)
+    except ValueError:
+        return "Input for review_id should be an integer"
+    except AttributeError:
+        return "Input for lender should be a non-null string"
