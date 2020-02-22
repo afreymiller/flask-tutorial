@@ -10,14 +10,20 @@ app = Flask(__name__)
 
 # env FLASK_APP=main.py flask run
 
+
 @app.route('/')
 def index():
     return 'Index Page'
 
-@app.route('/review')
-def get_reviews():
-    url = "https://www.lendingtree.com/reviews/personal/cashnetusa/81638970?OverallRating=4&pid=3"
-    response = requests.get(url)                                                                     
+@app.route('/reviews/<lender>/<int:number>')
+def get_reviews(lender, number):
+    URL_PREFIX = "https://www.lendingtree.com/reviews/personal/"
+    URL_PREFIX += lender
+    URL_PREFIX += "/"
+    URL_PREFIX += str(number)
+    URL_PREFIX += "?OverallRating=1&pid=1"
+    response = requests.get(URL_PREFIX)
+
     soup = BeautifulSoup(response.content, 'html.parser')   
 
     reviews = soup.select(".reviewDetail")
