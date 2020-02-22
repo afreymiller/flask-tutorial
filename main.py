@@ -20,10 +20,14 @@ def get_reviews():
     response = requests.get(url)                                                                     
     soup = BeautifulSoup(response.content, 'html.parser')   
 
-    review_text = soup.select(".reviewText")     
-    review_title = soup.select(".reviewTitle") 
-    reviewer_name = soup.select(".consumerName")
-    review_date = soup.select(".consumerReviewDate")
+    reviews = soup.select(".reviewDetail")
+
+    review = reviews[0]
+
+    review_text = review.select(".reviewText")     
+    review_title = review.select(".reviewTitle") 
+    reviewer_name = review.select(".consumerName")
+    review_date = review.select(".consumerReviewDate")
   
     value = review_text[0]   
     title = review_title[0]     
