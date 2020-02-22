@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from markupsafe import escape
 import requests
 import bs4
@@ -28,13 +28,20 @@ def get_reviews():
     review_title = review.select(".reviewTitle") 
     reviewer_name = review.select(".consumerName")
     review_date = review.select(".consumerReviewDate")
+
+    obj = {}
   
-    value = review_text[0]   
+    value = review_text[0]  
     title = review_title[0]     
     name = reviewer_name[0]
-    date = review_date[0]                                                                                                         
+    date = review_date[0]     
 
-    return str(value) + str(title) + str(name) + str(date)
+    obj['value'] = value.contents[0].strip()
+    obj['title'] = title.contents[0].strip()
+    obj['name'] = name.contents[0].strip()
+    obj['date'] = date.contents[0].strip()
+    #return str(value) + str(title) + str(name) + str(date)
+    return jsonify(reviews=obj)
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
