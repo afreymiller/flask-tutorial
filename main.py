@@ -22,38 +22,37 @@ def construct_url(lender, number):
     URL_PREFIX += "?OverallRating=1&pid=1"
     return URL_PREFIX
 
+def populate_review_fields(review):
+    review_text = review.select(".reviewText")     
+    review_title = review.select(".reviewTitle") 
+    reviewer_name = review.select(".consumerName")
+    review_date = review.select(".consumerReviewDate")
+
+    obj = {}
+  
+    value = review_text[0]  
+    title = review_title[0]     
+    name = reviewer_name[0]
+    date = review_date[0]
+
+    obj['value'] = value.contents[0].strip()
+    obj['title'] = title.contents[0].strip()
+    obj['name'] = name.contents[0].strip()
+    obj['date'] = date.contents[0].strip()
+
+    return obj
+
 def get_reviews_object(lender, number):
-    
     url = construct_url(lender, number)
-
     response = requests.get(url)
-
     soup = BeautifulSoup(response.content, 'html.parser')   
 
     reviews = soup.select(".reviewDetail")
 
-    review = reviews[0]
-
     objects = []
 
     for review in reviews:
-        review_text = review.select(".reviewText")     
-        review_title = review.select(".reviewTitle") 
-        reviewer_name = review.select(".consumerName")
-        review_date = review.select(".consumerReviewDate")
-
-        obj = {}
-  
-        value = review_text[0]  
-        title = review_title[0]     
-        name = reviewer_name[0]
-        date = review_date[0]
-
-        obj['value'] = value.contents[0].strip()
-        obj['title'] = title.contents[0].strip()
-        obj['name'] = name.contents[0].strip()
-        obj['date'] = date.contents[0].strip()
-
+        obj = populate_review_fields(review)
         objects.append(obj)
 
     return objects
