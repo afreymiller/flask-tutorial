@@ -1,8 +1,7 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-import bs4
-from bs4 import BeautifulSoup
+from review_field_utils import populate_review_fields, construct_url, parse_response_for_reviews
 
 app = Flask(__name__)
 
@@ -14,57 +13,13 @@ app = Flask(__name__)
 def index():
     return 'Index Page'
 
-def construct_url(lender, number):
-    URL_PREFIX = "https://www.lendingtree.com/reviews/personal/"
-    URL_PREFIX += lender
-    URL_PREFIX += "/"
-    URL_PREFIX += str(number)
-    URL_PREFIX += "?OverallRating=1&pid=1"
-    return URL_PREFIX
-
-def populate_review_fields(review):
-    field_dependencies = [{
-            "selector": ".reviewText",
-            "key": "value"
-        }, {
-            "selector": ".reviewTitle",
-            "key": "title"
-        }, {
-            "selector": ".consumerName",
-            "key": "name"
-        }, {
-            "selector": ".consumerReviewDate",
-            "key": "date"
-        }
-    ]
-
-    obj = {}
-
-    for field in field_dependencies: 
-        element = review.select(field['selector'])
-        value = element[0]
-        obj[field['key']] = value.contents[0].strip()
-
-    return obj
-
-def get_reviews_object(lender, number):
-    url = construct_url(lender, number)
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')   
-
-    reviews = soup.select(".reviewDetail")
-
-    objects = []
-
-    for review in reviews:
-        obj = populate_review_fields(review)
-        objects.append(obj)
-
-    return objects
+def execute_request(url):
+    return requests.get(url)
 
 @app.route('/reviews/<lender>/<int:number>')
 def get_reviews(lender, number):
-    
-    objects = get_reviews_object(lender, number)
+    url = construct_url(lender, number)
+    response = requests.get(url)
+    objects = parse_response_for_reviews(response)
     
     return jsonify(reviews=objects)
