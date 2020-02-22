@@ -1,5 +1,8 @@
 from flask import Flask
 from markupsafe import escape
+import requests
+import bs4
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -11,14 +14,18 @@ app = Flask(__name__)
 def index():
     return 'Index Page'
 
-@app.route("/hello")
-def main():
-    return "Hello, World!"
+@app.route('/review')
+def get_reviews():
+    url = "https://www.lendingtree.com/reviews/personal/cashnetusa/81638970?OverallRating=4&pid=3"
+    response = requests.get(url)                                                                     
+    soup = BeautifulSoup(response.content, 'html.parser')   
 
-@app.route('/user/<username>')
-def show_user_profile(username):
-    # show the user profile for that user
-    return 'User %s' % escape(username)
+    review_text = soup.select(".reviewText")      
+  
+    value = review_text[0]   
+    print(value)                                                                                                               
+
+    return str(value)
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
