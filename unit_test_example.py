@@ -1,5 +1,5 @@
 import unittest
-from review_field_utils import populate_review_fields, construct_url, parse_response_for_reviews
+from review_field_utils import populate_review_fields, construct_url, parse_reviews
 
 # https://docs.python.org/3/library/unittest.html
 

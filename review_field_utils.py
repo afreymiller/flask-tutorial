@@ -71,9 +71,13 @@ def construct_url(lender, review_id):
     except RuntimeError:
         raise RuntimeError("Lender must be non-null")
 
-def parse_response_for_reviews(response):
+# not unit testing this one unless I have extra time at the end
+def get_reviews_from_response(response):
     soup = BeautifulSoup(response.content, 'html.parser')   
     reviews = soup.select(".reviewDetail")
+    return reviews
+
+def parse_reviews(reviews):
 
     objects = []
 
