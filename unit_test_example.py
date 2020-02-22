@@ -5,6 +5,19 @@ from review_field_utils import populate_review_fields, construct_url, parse_resp
 
 class TestStringMethods(unittest.TestCase):
 
+    def test_construct_url_1(self):
+      expected_url_1 = "https://www.lendingtree.com/reviews/personal/cashnetusa/81638970?OverallRating=1&pid=1"
+      self.assertEqual(construct_url('cashnetusa', '81638970'), expected_url_1)
+
+    def test_construct_url_2(self):
+      expected_url_1 = "https://www.lendingtree.com/reviews/personal/cashnetusa/81638970?OverallRating=1&pid=1"
+      
+      with self.assertRaises(Exception) as context:
+            construct_url('cashnetusa', 'abc')
+
+      self.assertTrue('Input for number should be an int' in str(context.exception))
+      
+
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')
 
