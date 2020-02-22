@@ -48,6 +48,10 @@ def get_reviews():
     
     return jsonify(reviews=objects)
 
+@app.route('/dummy/<username>/<int:number>')
+def get_nested(username, number):
+    return 'User %s' % escape(username)
+
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
     # show the post with the given id, the id is an integer
