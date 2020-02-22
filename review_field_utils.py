@@ -26,6 +26,14 @@ def populate_review_fields(review):
 
     return obj
 
+def exception_parent(string):
+    try:
+        exception_child(string)
+    except RuntimeError:
+        raise RuntimeError("nullity")
+    except:
+        raise Exception("generic exception")
+
 def exception_child(string):
     try: 
         if (len(string) <= 0):

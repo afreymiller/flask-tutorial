@@ -28,6 +28,6 @@ def get_reviews(lender, review_id):
     
         return jsonify(reviews=objects)
     except ValueError:
-        return "Input for review_id should be an integer"
+        return "Input for review_id should be a non-negative integer"
     except AttributeError:
         return "Input for lender should be a non-null string"
