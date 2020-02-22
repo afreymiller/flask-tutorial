@@ -20,12 +20,17 @@ def get_reviews():
     response = requests.get(url)                                                                     
     soup = BeautifulSoup(response.content, 'html.parser')   
 
-    review_text = soup.select(".reviewText")      
+    review_text = soup.select(".reviewText")     
+    review_title = soup.select(".reviewTitle") 
+    reviewer_name = soup.select(".consumerName")
+    review_date = soup.select(".consumerReviewDate")
   
     value = review_text[0]   
-    print(value)                                                                                                               
+    title = review_title[0]     
+    name = reviewer_name[0]
+    date = review_date[0]                                                                                                         
 
-    return str(value)
+    return str(value) + str(title) + str(name) + str(date)
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
