@@ -24,24 +24,29 @@ def get_reviews():
 
     review = reviews[0]
 
-    review_text = review.select(".reviewText")     
-    review_title = review.select(".reviewTitle") 
-    reviewer_name = review.select(".consumerName")
-    review_date = review.select(".consumerReviewDate")
+    objects = []
 
-    obj = {}
+    for review in reviews:
+        review_text = review.select(".reviewText")     
+        review_title = review.select(".reviewTitle") 
+        reviewer_name = review.select(".consumerName")
+        review_date = review.select(".consumerReviewDate")
+
+        obj = {}
   
-    value = review_text[0]  
-    title = review_title[0]     
-    name = reviewer_name[0]
-    date = review_date[0]     
+        value = review_text[0]  
+        title = review_title[0]     
+        name = reviewer_name[0]
+        date = review_date[0]
 
-    obj['value'] = value.contents[0].strip()
-    obj['title'] = title.contents[0].strip()
-    obj['name'] = name.contents[0].strip()
-    obj['date'] = date.contents[0].strip()
-    #return str(value) + str(title) + str(name) + str(date)
-    return jsonify(reviews=obj)
+        obj['value'] = value.contents[0].strip()
+        obj['title'] = title.contents[0].strip()
+        obj['name'] = name.contents[0].strip()
+        obj['date'] = date.contents[0].strip()
+
+        objects.append(obj)
+    
+    return jsonify(reviews=objects)
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
