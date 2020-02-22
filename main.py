@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 # env FLASK_APP=main.py flask run
 
+# http://127.0.0.1:5000/reviews/upstart-network-inc/54350158
+
 @app.route('/')
 def index():
     return 'Index Page'
