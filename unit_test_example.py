@@ -12,25 +12,18 @@ class TestStringMethods(unittest.TestCase):
     def test_construct_url_2(self):
       expected_url_1 = "https://www.lendingtree.com/reviews/personal/cashnetusa/81638970?OverallRating=1&pid=1"
       
-      with self.assertRaises(Exception) as context:
+      with self.assertRaises(ValueError) as context:
             construct_url('cashnetusa', 'abc')
 
-      self.assertTrue('Input for number should be an int' in str(context.exception))
+      self.assertTrue('Input for review_id should be an integer' in str(context.exception))
       
+    def test_construct_url_3(self):
+      expected_url_1 = "https://www.lendingtree.com/reviews/personal/cashnetusa/81638970?OverallRating=1&pid=1"
+      
+      with self.assertRaises(AttributeError) as context:
+            construct_url(3, '1234123')
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
-
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
-
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+      self.assertTrue('Input for lender should be a non-null string' in str(context.exception))
 
 if __name__ == '__main__':
     unittest.main()
