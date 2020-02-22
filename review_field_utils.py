@@ -26,25 +26,6 @@ def populate_review_fields(review):
 
     return obj
 
-def exception_parent(string):
-    try:
-        exception_child(string)
-    except RuntimeError:
-        raise RuntimeError("nullity")
-    except:
-        raise Exception("generic exception")
-
-def exception_child(string):
-    try: 
-        if (len(string) <= 0):
-            raise RuntimeError("Null string")
-        else:
-            return string
-    except RuntimeError:
-        raise RuntimeError("the string was null")
-    except ValueError:
-        raise ValueError("this was the one")
-
 def construct_url(lender, review_id):
     try:
         id_as_int = int(review_id)
@@ -86,3 +67,22 @@ def parse_reviews(reviews):
         objects.append(obj)
 
     return objects
+
+def exception_parent(string):
+    try:
+        exception_child(string)
+    except RuntimeError:
+        raise RuntimeError("nullity")
+    except:
+        raise Exception("generic exception")
+
+def exception_child(string):
+    try: 
+        if (len(string) <= 0):
+            raise RuntimeError("Null string")
+        else:
+            return string
+    except RuntimeError:
+        raise RuntimeError("the string was null")
+    except ValueError:
+        raise ValueError("this was the one")
