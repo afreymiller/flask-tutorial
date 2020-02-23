@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup, Tag
 import requests
 import re
 import math
+import threading 
+import concurrent.futures
 
 def populate_review_fields(review, star_rating):
     # These should ideally come from either a database or parameter store, 
@@ -37,6 +39,16 @@ def populate_review_fields(review, star_rating):
     obj['stars'] = star_rating
 
     return obj
+
+def execute_thread_pool(closures, page_counts_per_star):
+    futures = []
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for index, closure in enumerate(closures):
+            future = executor.map(closure, range(page_counts_per_star[index]))
+            futures.append(future)
+
+    return futures
 
 def dummy():
     test_string = '''<p class="reviewText"><br/>Its was easy to do,
