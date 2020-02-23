@@ -2,6 +2,8 @@ import bs4
 from bs4 import BeautifulSoup, Tag
 
 def populate_review_fields(review, star_rating):
+    # These should ideally come from either a database or parameter store, 
+    # but for the purposes of this exercise I'll leave them here for now.
     field_dependencies = [{
             "selector": ".reviewText",
             "key": "value"
@@ -56,6 +58,8 @@ def construct_url_prefix(lender, review_id, star_rating):
     try:
         id_as_int = int(review_id)
 
+        # From observations, pretty sure flask's routing already throws 
+        # an error for negative values but just in case...
         if (id_as_int < 0):
             raise ValueError("review_id should be a non-negative integer.")
 

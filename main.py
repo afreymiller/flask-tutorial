@@ -42,7 +42,6 @@ def get_reviews(lender, review_id):
         flattened = []
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
 
-        #while (response.status_code >= 200 and response.status_code <= 299):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = [executor.map(closure, range(10)) for closure in closures]
             objects_ag = [x for sublist in futures for x in sublist]
