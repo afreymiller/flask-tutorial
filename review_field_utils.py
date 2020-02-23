@@ -112,6 +112,8 @@ def get_star_frequencies(lender, review_id):
 
     in_order = star_frequencies[::-1]
 
+    print(in_order)
+
     return in_order
 
 def parse_reviews(reviews, star_rating):
