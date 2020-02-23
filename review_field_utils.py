@@ -51,30 +51,14 @@ def execute_thread_pool(closures, page_counts_per_star):
 
     return futures
 
+# Probably won't get to unit testing this one because I'm not sure how to
+# create a future without just calling executor thread map
 def get_flattened_reviews_from_futures(futures):
     objects_ag = [x for sublist in futures for x in sublist]
 
     flattened_reviews = [x for sublist in objects_ag for x in sublist]
 
     return flattened_reviews
-
-def dummy():
-    test_string = '''<p class="reviewText"><br/>Its was easy to do,
-    he agent was very helpful and the money was there the next morning so that was a big help<br/></p>'''                                             
-
-    soup = BeautifulSoup(test_string, 'html.parser')                                                         
-
-    print(soup.contents)
-    print(soup.contents[0])
-
-    element = soup.select('.reviewText')
-
-    print(element)
-
-    print(element[0].contents) 
-
-    print(elem for elem in element[0].children)
-
 
 # Unit testing complete
 def construct_url_prefix(lender, review_id, star_rating):
@@ -117,8 +101,6 @@ def get_star_frequencies(lender, review_id):
 
     soup = BeautifulSoup(response.content, 'html.parser')   
     star_count = soup.select(".review-count-text")
-
-    # Maybe use ::-1 here
 
     star_frequencies = []
             
