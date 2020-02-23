@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-from review_field_utils import populate_review_fields, get_star_frequencies, construct_url_prefix, parse_reviews, get_reviews_from_response
+from review_field_utils import populate_review_fields, get_star_frequencies, execute_thread_pool, construct_url_prefix, parse_reviews, get_reviews_from_response
 import threading 
 import concurrent.futures
 import bs4
@@ -46,21 +46,13 @@ def get_response(lender, review_id, star_rating):
 @app.route('/reviews/<lender>/<int:review_id>')
 def get_reviews(lender, review_id):
     try: 
-        objects_ag = []
-        flattened = []
-
         page_counts_per_star = get_star_frequencies(lender, review_id)
 
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
 
         # https://gist.github.com/mangecoeur/9540178
 
-        futures = []
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for index, closure in enumerate(closures):
-                future = executor.map(closure, range(page_counts_per_star[index]))
-                futures.append(future)
+        futures = execute_thread_pool(closures, page_counts_per_star)
 
         # Should the following lines be part of the thread pool executor?
         objects_ag = [x for sublist in futures for x in sublist]
