@@ -40,6 +40,16 @@ def populate_review_fields(review, star_rating):
 
     return obj
 
+def reviews_are_equal(review_1, review_2):
+    fields = ["date", "title", "name", "stars", "value"]
+
+    are_equal = True
+
+    for field in fields:
+        are_equal &= review_1[field] == review_2[field]
+
+    return are_equal
+
 # Probably won't get to unit testing this one before the deadline
 def execute_thread_pool(closures, page_counts_per_star):
     futures = []
@@ -111,8 +121,6 @@ def get_star_frequencies(lender, review_id):
         star_frequencies.append(page_count)
 
     in_order = star_frequencies[::-1]
-
-    print(in_order)
 
     return in_order
 

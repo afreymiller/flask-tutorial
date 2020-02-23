@@ -1,9 +1,9 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-from review_field_utils import populate_review_fields, get_star_frequencies, execute_thread_pool
-from review_field_utils import construct_url_prefix, parse_reviews, get_flattened_reviews_from_futures
-from review_field_utils import get_reviews_from_response
+from reviews_utils import populate_review_fields, get_star_frequencies, execute_thread_pool
+from reviews_utils import construct_url_prefix, parse_reviews, get_flattened_reviews_from_futures
+from reviews_utils import get_reviews_from_response, reviews_are_equal
 import threading 
 import concurrent.futures
 import bs4
@@ -58,16 +58,6 @@ def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
     
     return execute
 
-def reviews_are_equal(review_1, review_2):
-    fields = ["date", "title", "name", "stars", "value"]
-
-    are_equal = True
-
-    for field in fields:
-        are_equal &= review_1[field] == review_2[field]
-
-    return are_equal
-
 @app.route('/reviews/<lender>/<int:review_id>')
 def get_reviews(lender, review_id):
     try: 
@@ -79,18 +69,18 @@ def get_reviews(lender, review_id):
 
         futures = execute_thread_pool(closures, page_counts_per_star)
 
-        flattened = get_flattened_reviews_from_futures(futures)
+        flattened_reviews = get_flattened_reviews_from_futures(futures)
 
-        new_flattened = []
+        duplicates_removed = []
 
-        for review in flattened:
-            filtered_objs = [item for item in new_flattened if reviews_are_equal(item, review)]
+        for review in flattened_reviews:
+            filtered_objs = [item for item in duplicates_removed if reviews_are_equal(item, review)]
             if (len(filtered_objs) == 0):
-                new_flattened.append(review)
+                duplicates_removed.append(review)
 
-        print(len(new_flattened))
+        print(len(duplicates_removed))
 
-        return jsonify(reviews=new_flattened)
+        return jsonify(reviews=duplicates_removed)
     except ValueError:
         return "Input for review_id should be a non-negative integer"
     except AttributeError:
