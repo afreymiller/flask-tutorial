@@ -1,7 +1,8 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-from review_field_utils import populate_review_fields, get_star_frequencies, execute_thread_pool, construct_url_prefix, parse_reviews, get_reviews_from_response
+from review_field_utils import populate_review_fields, get_star_frequencies, execute_thread_pool
+from review_field_utils import construct_url_prefix, parse_reviews, get_flattened_reviews_from_futures, get_reviews_from_response
 import threading 
 import concurrent.futures
 import bs4
@@ -54,9 +55,7 @@ def get_reviews(lender, review_id):
 
         futures = execute_thread_pool(closures, page_counts_per_star)
 
-        # Should the following lines be part of the thread pool executor?
-        objects_ag = [x for sublist in futures for x in sublist]
-        flattened = [x for sublist in objects_ag for x in sublist]
+        flattened = get_flattened_reviews_from_futures(futures)
 
         #if (response.status_code < 200 or response.status_code > 299):
         #    return "Did not get successful response: " + str(response.status_code) 

@@ -50,6 +50,13 @@ def execute_thread_pool(closures, page_counts_per_star):
 
     return futures
 
+def get_flattened_reviews_from_futures(futures):
+    objects_ag = [x for sublist in futures for x in sublist]
+
+    flattened_reviews = [x for sublist in objects_ag for x in sublist]
+
+    return flattened_reviews
+
 def dummy():
     test_string = '''<p class="reviewText"><br/>Its was easy to do,
     he agent was very helpful and the money was there the next morning so that was a big help<br/></p>'''                                             
