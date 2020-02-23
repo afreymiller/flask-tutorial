@@ -50,8 +50,6 @@ def get_reviews(lender, review_id):
             if (len(filtered_objs) == 0):
                 duplicates_removed.append(review)
 
-        #print(len(duplicates_removed))
-
         return jsonify(reviews_count=len(duplicates_removed),reviews=duplicates_removed)
     except ValueError:
         return "Input for review_id should be a non-negative integer"
