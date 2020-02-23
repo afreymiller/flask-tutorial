@@ -169,5 +169,10 @@ class TestStringMethods(unittest.TestCase):
 
       self.assertEqual([4, 2, 2, 5, 145], output_1)
 
+    def test_get_star_frequencies_2(self):
+      output_2 = get_star_frequencies('cashnetusa', 81638970)
+
+      self.assertEqual([2, 2, 4, 18, 155], output_2)
+
 if __name__ == '__main__':
     unittest.main()
