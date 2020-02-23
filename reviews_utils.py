@@ -6,6 +6,7 @@ import math
 import threading 
 import concurrent.futures
 
+
 # Added positive unit tests, will add some more negative ones
 def populate_review_fields(review, star_rating):
     # These should ideally come from either a database or parameter store, 
@@ -133,3 +134,34 @@ def parse_reviews(reviews, star_rating):
         objects.append(obj)
 
     return objects
+
+# I'm not testing this one
+def execute_request(url):
+    return requests.get(url)
+
+# I'm not testing this one
+def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
+
+    # helpful: https://www.hackerearth.com/practice/python/functional-programming/higher-order-functions-and-decorators/tutorial/
+
+    url_prefix = construct_url_prefix(lender, review_id, star_rating)
+
+    def execute(page_index):
+        url = ""
+
+        if (page_limit_for_star <= 2):
+            url = url_prefix
+        else:
+            url = url_prefix + '&pid=' + str(page_index)
+        
+        response = execute_request(url)
+
+        objects = []
+
+        if response.status_code >= 200 or respose.status_code <= 299:
+            reviews = get_reviews_from_response(response)
+            objects = parse_reviews(reviews, star_rating)
+
+        return objects
+    
+    return execute
