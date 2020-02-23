@@ -41,18 +41,39 @@ def get_reviews(lender, review_id):
         #page_index = 1
         #url = construct_url(lender, review_id, 5, page_index)
         #response = requests.get(url)
-        objects_agg = []
-        closure = get_response(lender, review_id, 5)
+        objects_agg_5 = []
+        objects_agg_4 = []
+        objects_agg_3 = []
+        objects_agg_2 = []
+        objects_agg_1 = []
+        closure_5 = get_response(lender, review_id, 5)
+        closure_4 = get_response(lender, review_id, 4)
+        closure_3 = get_response(lender, review_id, 3)
+        closure_2 = get_response(lender, review_id, 2)
+        closure_1 = get_response(lender, review_id, 1)
 
         #while (response.status_code >= 200 and response.status_code <= 299):
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.map(closure, range(200))
-            objects_agg = [x for sublist in future for x in sublist]
+            future_5 = executor.map(closure_5, range(200))
+            future_4 = executor.map(closure_4, range(10))
+            future_3 = executor.map(closure_3, range(10))
+            future_2 = executor.map(closure_2, range(10))
+            future_1 = executor.map(closure_1, range(10))
+            objects_agg_5 = [x for sublist in future_5 for x in sublist]
+            objects_agg_4 = [x for sublist in future_4 for x in sublist]
+            objects_agg_3 = [x for sublist in future_3 for x in sublist]
+            objects_agg_2 = [x for sublist in future_2 for x in sublist]
+            objects_agg_1 = [x for sublist in future_1 for x in sublist]
+
+        objects_agg_5.append(objects_agg_4)
+        objects_agg_5.append(objects_agg_3)
+        objects_agg_5.append(objects_agg_2)
+        objects_agg_5.append(objects_agg_1)
 
         #if (response.status_code < 200 or response.status_code > 299):
         #    return "Did not get successful response: " + str(response.status_code) 
 
-        return jsonify(reviews=objects_agg)
+        return jsonify(reviews=objects_agg_5)
     except ValueError:
         return "Input for review_id should be a non-negative integer"
     except AttributeError:
