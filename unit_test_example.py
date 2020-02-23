@@ -1,5 +1,5 @@
 import unittest
-from review_field_utils import populate_review_fields, construct_url_prefix, parse_reviews
+from reviews_utils import populate_review_fields, construct_url_prefix, parse_reviews, reviews_are_equal
 import bs4
 from bs4 import BeautifulSoup
 
@@ -116,6 +116,29 @@ class TestStringMethods(unittest.TestCase):
       self.assertEqual(output_2['title'], "Lorem ipsum")
       self.assertEqual(output_2['value'], "Its was easy to do, he agent was very helpful and the money was there the next morning so that was a big help")
       self.assertEqual(output_2['stars'], 3)
+
+    def test_reviews_are_equal_true_case(self):
+      review_1 = {}
+      review_2 = {}
+
+      review_1["name"] = "Adam"
+      review_2["name"] = "Adam"
+
+      review_1["title"] = "The title"
+      review_2["title"] = "The title"
+
+      review_1["value"] = "val 1"
+      review_2["value"] = "val 1"
+
+      review_1["stars"] = 2
+      review_2["stars"] = 2
+
+      review_1["date"] = "February 2020"
+      review_2["date"] = "February 2020"
+
+      bool_1 = reviews_are_equal(review_1, review_2)
+
+      self.assertTrue(bool_1)
 
 if __name__ == '__main__':
     unittest.main()
