@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-from review_field_utils import populate_review_fields, construct_url_prefix, parse_reviews, get_reviews_from_response
+from review_field_utils import populate_review_fields, get_star_frequencies, construct_url_prefix, parse_reviews, get_reviews_from_response
 import threading 
 import concurrent.futures
 import bs4
@@ -49,23 +49,7 @@ def get_reviews(lender, review_id):
         objects_ag = []
         flattened = []
 
-        url = construct_url_prefix(lender, review_id, 5)
-        response = requests.get(url)
-
-        soup = BeautifulSoup(response.content, 'html.parser')   
-        star_count = soup.select(".review-count-text")
-
-        # Maybe use ::-1 here
-
-        star_frequencies = []
-            
-        # make this more readable
-        for frequency in star_count:
-            freq_as_int = int(re.sub(r'[\(\)]', '', frequency.contents[0]))
-            page_count = (math.ceil(freq_as_int/10)) + 1
-            star_frequencies.append(page_count)
-
-        in_order = star_frequencies[::-1]
+        page_counts_per_star = get_star_frequencies(lender, review_id)
 
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
 
@@ -75,7 +59,7 @@ def get_reviews(lender, review_id):
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             for index, closure in enumerate(closures):
-                future = executor.map(closure, range(in_order[index]))
+                future = executor.map(closure, range(page_counts_per_star[index]))
                 futures.append(future)
 
         # Should the following lines be part of the thread pool executor?

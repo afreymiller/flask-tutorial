@@ -1,5 +1,8 @@
 import bs4
 from bs4 import BeautifulSoup, Tag
+import requests
+import re
+import math
 
 def populate_review_fields(review, star_rating):
     # These should ideally come from either a database or parameter store, 
@@ -87,6 +90,27 @@ def get_reviews_from_response(response):
     soup = BeautifulSoup(response.content, 'html.parser')   
     reviews = soup.select(".reviewDetail")
     return reviews
+
+def get_star_frequencies(lender, review_id):
+    url = construct_url_prefix(lender, review_id, 5)
+    response = requests.get(url)
+
+    soup = BeautifulSoup(response.content, 'html.parser')   
+    star_count = soup.select(".review-count-text")
+
+    # Maybe use ::-1 here
+
+    star_frequencies = []
+            
+    # make this more readable
+    for frequency in star_count:
+        freq_as_int = int(re.sub(r'[\(\)]', '', frequency.contents[0]))
+        page_count = (math.ceil(freq_as_int/10)) + 1
+        star_frequencies.append(page_count)
+
+    in_order = star_frequencies[::-1]
+
+    return in_order
 
 def parse_reviews(reviews, star_rating):
 
