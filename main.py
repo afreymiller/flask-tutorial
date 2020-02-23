@@ -4,6 +4,8 @@ import requests
 from review_field_utils import populate_review_fields, construct_url_prefix, parse_reviews, get_reviews_from_response
 import threading 
 import concurrent.futures
+import bs4
+from bs4 import BeautifulSoup, Tag
 
 app = Flask(__name__)
 
@@ -40,12 +42,33 @@ def get_reviews(lender, review_id):
     try: 
         objects_ag = []
         flattened = []
+
+        url = construct_url_prefix(lender, review_id, 5)
+        response = requests.get(url)
+
+        soup = BeautifulSoup(response.content, 'html.parser')   
+        star_count = soup.select(".review-count-text")
+
+        for star in star_count:
+            print(star.contents)
+
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
 
+        star_frequencies = [21, 1, 1, 39, 100]
+        #print(star_count)
+
+        # https://gist.github.com/mangecoeur/9540178
+
+        futures = []
+
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = [executor.map(closure, range(10)) for closure in closures]
-            objects_ag = [x for sublist in futures for x in sublist]
-            flattened = [x for sublist in objects_ag for x in sublist]
+            for index, closure in enumerate(closures):
+                future = executor.map(closure, range(star_frequencies[index]))
+                futures.append(future)
+
+        # Should the following lines be part of the thread pool executor?
+        objects_ag = [x for sublist in futures for x in sublist]
+        flattened = [x for sublist in objects_ag for x in sublist]
 
         #if (response.status_code < 200 or response.status_code > 299):
         #    return "Did not get successful response: " + str(response.status_code) 
