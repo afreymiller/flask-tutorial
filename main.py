@@ -59,13 +59,14 @@ def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
     return execute
 
 def reviews_are_equal(review_1, review_2):
-    dates_equal = review_1["date"] == review_2["date"]
-    titles_equal = review_1["title"] == review_2["title"]
-    names_equal = review_1["name"] == review_2["name"]
-    stars_equal = review_1["stars"] == review_2["stars"]
-    values_equal = review_1["value"] == review_2["value"]
+    fields = ["date", "title", "name", "stars", "value"]
 
-    return dates_equal and titles_equal and names_equal and stars_equal and values_equal
+    are_equal = True
+
+    for field in fields:
+        are_equal &= review_1[field] == review_2[field]
+
+    return are_equal
 
 @app.route('/reviews/<lender>/<int:review_id>')
 def get_reviews(lender, review_id):
