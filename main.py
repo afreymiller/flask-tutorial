@@ -41,36 +41,20 @@ def get_reviews(lender, review_id):
         #page_index = 1
         #url = construct_url(lender, review_id, 5, page_index)
         #response = requests.get(url)
-        objects_agg_5 = []
-        objects_agg_4 = []
-        objects_agg_3 = []
-        objects_agg_2 = []
-        objects_agg_1 = []
+        objects_ag = []
+        flattened = []
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
 
         #while (response.status_code >= 200 and response.status_code <= 299):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = [executor.map(closure, range(10)) for closure in closures]
-            future_5 = futures[0]
-            future_4 = futures[1]
-            future_3 = futures[2]
-            future_2 = futures[3]
-            future_1 = futures[4]
-            objects_agg_5 = [x for sublist in future_5 for x in sublist]
-            objects_agg_4 = [x for sublist in future_4 for x in sublist]
-            objects_agg_3 = [x for sublist in future_3 for x in sublist]
-            objects_agg_2 = [x for sublist in future_2 for x in sublist]
-            objects_agg_1 = [x for sublist in future_1 for x in sublist]
-
-        objects_agg_5.append(objects_agg_4)
-        objects_agg_5.append(objects_agg_3)
-        objects_agg_5.append(objects_agg_2)
-        objects_agg_5.append(objects_agg_1)
+            objects_ag = [x for sublist in futures for x in sublist]
+            flattened = [x for sublist in objects_ag for x in sublist]
 
         #if (response.status_code < 200 or response.status_code > 299):
         #    return "Did not get successful response: " + str(response.status_code) 
 
-        return jsonify(reviews=objects_agg_5)
+        return jsonify(reviews=flattened)
     except ValueError:
         return "Input for review_id should be a non-negative integer"
     except AttributeError:
