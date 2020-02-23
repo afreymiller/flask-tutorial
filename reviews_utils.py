@@ -82,6 +82,7 @@ def construct_url_prefix(lender, review_id, star_rating):
     except RuntimeError:
         raise RuntimeError("Lender must be non-null")
 
+# Add unit tests
 def get_star_frequencies(lender, review_id):
     url = construct_url_prefix(lender, review_id, 5)
     response = execute_request(url)
