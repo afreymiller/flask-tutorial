@@ -40,6 +40,7 @@ def populate_review_fields(review, star_rating):
 
     return obj
 
+# Probably won't get to unit testing this one before the deadline
 def execute_thread_pool(closures, page_counts_per_star):
     futures = []
 
@@ -75,7 +76,7 @@ def dummy():
     print(elem for elem in element[0].children)
 
 
-
+# Unit testing complete
 def construct_url_prefix(lender, review_id, star_rating):
     try:
         id_as_int = int(review_id)
