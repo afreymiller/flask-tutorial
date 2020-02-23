@@ -46,19 +46,16 @@ def get_reviews(lender, review_id):
         objects_agg_3 = []
         objects_agg_2 = []
         objects_agg_1 = []
-        closure_5 = get_response(lender, review_id, 5)
-        closure_4 = get_response(lender, review_id, 4)
-        closure_3 = get_response(lender, review_id, 3)
-        closure_2 = get_response(lender, review_id, 2)
-        closure_1 = get_response(lender, review_id, 1)
+        closures = [get_response(lender, review_id, x) for x in range(1, 6)]
 
         #while (response.status_code >= 200 and response.status_code <= 299):
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_5 = executor.map(closure_5, range(200))
-            future_4 = executor.map(closure_4, range(10))
-            future_3 = executor.map(closure_3, range(10))
-            future_2 = executor.map(closure_2, range(10))
-            future_1 = executor.map(closure_1, range(10))
+            futures = [executor.map(closure, range(10)) for closure in closures]
+            future_5 = futures[0]
+            future_4 = futures[1]
+            future_3 = futures[2]
+            future_2 = futures[3]
+            future_1 = futures[4]
             objects_agg_5 = [x for sublist in future_5 for x in sublist]
             objects_agg_4 = [x for sublist in future_4 for x in sublist]
             objects_agg_3 = [x for sublist in future_3 for x in sublist]
