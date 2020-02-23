@@ -42,7 +42,7 @@ def populate_review_fields(review, star_rating):
 
     return obj
 
-# Unit testing complete
+# Added positive and negative unit tests
 def reviews_are_equal(review_1, review_2):
     fields = ["date", "title", "name", "stars", "value"]
 

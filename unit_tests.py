@@ -1,5 +1,6 @@
 import unittest
 from reviews_utils import populate_review_fields, construct_url_prefix, parse_reviews, reviews_are_equal
+from reviews_utils import get_star_frequencies
 import bs4
 from bs4 import BeautifulSoup
 
@@ -162,6 +163,11 @@ class TestStringMethods(unittest.TestCase):
       bool_1 = reviews_are_equal(review_1, review_2)
 
       self.assertFalse(bool_1)
+
+    def test_get_star_frequencies_1(self):
+      output_1 = get_star_frequencies('upstart-network-inc', 54350158)
+
+      self.assertEqual([4, 2, 2, 5, 145], output_1)
 
 if __name__ == '__main__':
     unittest.main()
