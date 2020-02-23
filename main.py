@@ -5,6 +5,8 @@ from review_field_utils import populate_review_fields, construct_url_prefix, par
 import threading 
 import concurrent.futures
 import bs4
+import re
+import math
 from bs4 import BeautifulSoup, Tag
 
 app = Flask(__name__)
@@ -14,6 +16,10 @@ app = Flask(__name__)
 # env FLASK_APP=main.py flask run
 
 # http://127.0.0.1:5000/reviews/upstart-network-inc/54350158
+
+# https://www.lendingtree.com/reviews/personal/upstart-network-inc/54350158
+
+# https://www.lendingtree.com/reviews/personal/cashnetusa/81638970
 
 @app.route('/')
 def index():
@@ -49,13 +55,19 @@ def get_reviews(lender, review_id):
         soup = BeautifulSoup(response.content, 'html.parser')   
         star_count = soup.select(".review-count-text")
 
-        for star in star_count:
-            print(star.contents)
+        # Maybe use ::-1 here
+
+        star_frequencies = []
+            
+        # make this more readable
+        for frequency in star_count:
+            freq_as_int = int(re.sub(r'[\(\)]', '', frequency.contents[0]))
+            page_count = (math.ceil(freq_as_int/10)) + 1
+            star_frequencies.append(page_count)
+
+        in_order = star_frequencies[::-1]
 
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
-
-        star_frequencies = [21, 1, 1, 39, 100]
-        #print(star_count)
 
         # https://gist.github.com/mangecoeur/9540178
 
@@ -63,7 +75,7 @@ def get_reviews(lender, review_id):
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             for index, closure in enumerate(closures):
-                future = executor.map(closure, range(star_frequencies[index]))
+                future = executor.map(closure, range(in_order[index]))
                 futures.append(future)
 
         # Should the following lines be part of the thread pool executor?
@@ -72,6 +84,8 @@ def get_reviews(lender, review_id):
 
         #if (response.status_code < 200 or response.status_code > 299):
         #    return "Did not get successful response: " + str(response.status_code) 
+
+        print(len(flattened))
 
         return jsonify(reviews=flattened)
     except ValueError:
