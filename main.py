@@ -30,7 +30,7 @@ def get_response(lender, review_id, star_rating):
         url = url_prefix + '&pid=' + str(page_index)
         response = execute_request(url)
         reviews = get_reviews_from_response(response)
-        objects = parse_reviews(reviews)
+        objects = parse_reviews(reviews, star_rating)
         return objects
     
     return execute

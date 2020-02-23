@@ -1,7 +1,7 @@
 import bs4
 from bs4 import BeautifulSoup, Tag
 
-def populate_review_fields(review):
+def populate_review_fields(review, star_rating):
     field_dependencies = [{
             "selector": ".reviewText",
             "key": "value"
@@ -28,6 +28,8 @@ def populate_review_fields(review):
         text = [x for x in value.contents if type(x) != Tag]
 
         obj[field['key']] = text[0].strip()
+
+    obj['stars'] = star_rating
 
     return obj
 
@@ -82,31 +84,12 @@ def get_reviews_from_response(response):
     reviews = soup.select(".reviewDetail")
     return reviews
 
-def parse_reviews(reviews):
+def parse_reviews(reviews, star_rating):
 
     objects = []
 
     for review in reviews:
-        obj = populate_review_fields(review)
+        obj = populate_review_fields(review, star_rating)
         objects.append(obj)
 
     return objects
-
-def exception_parent(string):
-    try:
-        exception_child(string)
-    except RuntimeError:
-        raise RuntimeError("nullity")
-    except:
-        raise Exception("generic exception")
-
-def exception_child(string):
-    try: 
-        if (len(string) <= 0):
-            raise RuntimeError("Null string")
-        else:
-            return string
-    except RuntimeError:
-        raise RuntimeError("the string was null")
-    except ValueError:
-        raise ValueError("this was the one")
