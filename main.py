@@ -19,6 +19,8 @@ app = Flask(__name__)
 
 # http://127.0.0.1:5000/reviews/upstart-network-inc/54350158
 
+# http://127.0.0.1:5000/reviews/cashnetusa/81638970
+
 # https://www.lendingtree.com/reviews/personal/upstart-network-inc/54350158
 
 # https://www.lendingtree.com/reviews/personal/cashnetusa/81638970
@@ -30,14 +32,20 @@ def index():
 def execute_request(url):
     return requests.get(url)
 
-def get_response_closure(lender, review_id, star_rating):
+def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
 
     # helpful: https://www.hackerearth.com/practice/python/functional-programming/higher-order-functions-and-decorators/tutorial/
 
     url_prefix = construct_url_prefix(lender, review_id, star_rating)
 
     def execute(page_index):
-        url = url_prefix + '&pid=' + str(page_index)
+        url = ""
+
+        if (page_limit_for_star <= 2):
+            url = url_prefix
+        else:
+            url = url_prefix + '&pid=' + str(page_index)
+        
         response = execute_request(url)
 
         objects = []
@@ -64,7 +72,7 @@ def get_reviews(lender, review_id):
     try: 
         page_counts_per_star = get_star_frequencies(lender, review_id)
 
-        closures = [get_response_closure(lender, review_id, x) for x in range(1, 6)]
+        closures = [get_response_closure(lender, review_id, page_counts_per_star[x], x+1) for x in range(5)]
 
         # https://gist.github.com/mangecoeur/9540178
 
