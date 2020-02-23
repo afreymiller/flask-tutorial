@@ -1,5 +1,5 @@
 import bs4
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 def populate_review_fields(review):
     field_dependencies = [{
@@ -19,12 +19,36 @@ def populate_review_fields(review):
 
     obj = {}
 
+    # Get rid of breaks from in here. Needs to be unit test around this 
+
     for field in field_dependencies: 
         element = review.select(field['selector'])
         value = element[0]
-        obj[field['key']] = value.contents[0].strip()
+
+        text = [x for x in value.contents if type(x) != Tag]
+
+        obj[field['key']] = text[0].strip()
 
     return obj
+
+def dummy():
+    test_string = '''<p class="reviewText"><br/>Its was easy to do,
+    he agent was very helpful and the money was there the next morning so that was a big help<br/></p>'''                                             
+
+    soup = BeautifulSoup(test_string, 'html.parser')                                                         
+
+    print(soup.contents)
+    print(soup.contents[0])
+
+    element = soup.select('.reviewText')
+
+    print(element)
+
+    print(element[0].contents) 
+
+    print(elem for elem in element[0].children)
+
+
 
 def construct_url(lender, review_id, star_rating, page):
     try:
