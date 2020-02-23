@@ -76,6 +76,46 @@ class TestStringMethods(unittest.TestCase):
       self.assertEqual(output_1['title'], "Excellent Customer Service")
       self.assertEqual(output_1['value'], "Kara at Wyndham Capitol is the Queen of Refi. If your looking for great service and a easy hassle free refi or new home loan look no further!")
       self.assertEqual(output_1['stars'], 5)
+    
+    def test_populate_review_fields_2(self):
+      review2 = '''
+        <div class="col-lg-9 col-sm-8 col-xs-12 reviewDetail">
+        <p class="reviewTitle">Lorem ipsum</p>
+        <p class="reviewText"><br/>Its was easy to do, he agent was very helpful and the money was there the next morning so that was a big help<br/></p>
+        <div aria-hidden="true" class="hideText">
+        <p class="consumerName">John Doe                                                                      <span>from BEL AIR, MD</span></p>
+        <p class="consumerReviewDate">Reviewed in April 2019</p>
+        </div>
+        <div class="helpfull-count desktop-view">
+        <div class="helpfull-section">
+        <input class="reviewId" name="reviewId" type="hidden" value="5e4c78ae13c6370001bb56f5"/>
+        <div class="flagged-review">
+        <button aria-label="Mark this review as flagged" class="flag" id="flag-5e4c78ae13c6370001bb56f5">
+        <div class="flag-content">
+        <img alt="" src="https://www.lendingtree.com/content/themes/lt-wp-www-theme/dist/images/lender-review/review-flag-desktop.png"/>
+        <span class="flag-text">Flag review</span>
+        </div>
+        </button>
+        </div>
+        </div>
+        </div>
+        </div>
+      '''
+
+      review_2_as_soup = BeautifulSoup(review2, 'html.parser')
+
+      output_2 = populate_review_fields(review_2_as_soup, 3)
+
+      self.assertTrue('value' in output_2)
+      self.assertTrue('name' in output_2)
+      self.assertTrue('title' in output_2)
+      self.assertTrue('date' in output_2)
+      self.assertTrue('stars' in output_2)
+      self.assertEqual(output_2['date'], "Reviewed in April 2019")
+      self.assertEqual(output_2['name'], "John Doe")
+      self.assertEqual(output_2['title'], "Lorem ipsum")
+      self.assertEqual(output_2['value'], "Its was easy to do, he agent was very helpful and the money was there the next morning so that was a big help")
+      self.assertEqual(output_2['stars'], 3)
 
 if __name__ == '__main__':
     unittest.main()

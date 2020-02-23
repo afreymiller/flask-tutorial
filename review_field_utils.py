@@ -6,6 +6,7 @@ import math
 import threading 
 import concurrent.futures
 
+# Added positive unit tests, will add some more negative ones
 def populate_review_fields(review, star_rating):
     # These should ideally come from either a database or parameter store, 
     # but for the purposes of this exercise I'll leave them here for now.
@@ -26,12 +27,11 @@ def populate_review_fields(review, star_rating):
 
     obj = {}
 
-    # Get rid of breaks from in here. Needs to be unit test around this 
-
     for field in field_dependencies: 
         element = review.select(field['selector'])
         value = element[0]
 
+        # Checking for type of Tag due to one edge case related to <br/> tags found
         text = [x for x in value.contents if type(x) != Tag]
 
         obj[field['key']] = text[0].strip()
