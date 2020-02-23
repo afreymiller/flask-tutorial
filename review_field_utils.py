@@ -112,6 +112,8 @@ def get_star_frequencies(lender, review_id):
 
     in_order = star_frequencies[::-1]
 
+    print(in_order)
+
     return in_order
 
 def parse_reviews(reviews, star_rating):
@@ -121,5 +123,11 @@ def parse_reviews(reviews, star_rating):
     for review in reviews:
         obj = populate_review_fields(review, star_rating)
         objects.append(obj)
+
+    print("star rating")
+    print(star_rating)
+
+    if (star_rating == 2 or star_rating == 3):
+        print(reviews)
 
     return objects
