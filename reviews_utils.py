@@ -9,6 +9,17 @@ import concurrent.futures
 
 # Added positive unit tests, will add some more negative ones
 def populate_review_fields(review, star_rating):
+    """ 
+    Given a review tag and star_rating, populates a dictionary
+    with appropriate fields.
+  
+    Parameters: 
+    review (Tag): html div tag of review containing all info to parse.
+    star_rating (int): 1-5
+  
+    Returns: 
+    Dictionary of appropriate review fields.
+    """
 
     # These should ideally come from either a database or parameter store, 
     # but for the purposes of this exercise I'll leave them here for now.
@@ -20,7 +31,7 @@ def populate_review_fields(review, star_rating):
             "key": "title"
         }, {
             "selector": ".consumerName",
-            "key": "name"
+            "key": "author"
         }, {
             "selector": ".consumerReviewDate",
             "key": "date"
@@ -44,7 +55,17 @@ def populate_review_fields(review, star_rating):
 
 # Added positive and negative unit tests
 def reviews_are_equal(review_1, review_2):
-    fields = ["date", "title", "name", "stars", "value"]
+    """ 
+    Given two review objects, returns true if they are equal, false otherwise.
+  
+    Parameters: 
+    review_1: review object
+    review_2: review object
+  
+    Returns: 
+    Boolean, True if they're, equal. False if not.
+    """
+    fields = ["date", "title", "author", "stars", "value"]
 
     are_equal = True
 
@@ -55,6 +76,17 @@ def reviews_are_equal(review_1, review_2):
 
 # Unit testing complete
 def construct_url_prefix(lender, review_id, star_rating):
+    """ 
+    Given lender, id, and star rating, returns URL for GET.
+  
+    Parameters: 
+    lender: String
+    review_id: String/int
+    star_rating: int
+  
+    Returns: 
+    URL string.
+    """
     try:
         id_as_int = int(review_id)
 
@@ -83,7 +115,10 @@ def construct_url_prefix(lender, review_id, star_rating):
         raise RuntimeError("Lender must be non-null")
 
 # Add unit tests
-def get_star_frequencies(lender, review_id):
+def get_page_limits(lender, review_id):
+    '''
+    Given lender and review_id, returns the 
+    '''
     url = construct_url_prefix(lender, review_id, 5)
     response = execute_request(url)
 
@@ -102,7 +137,9 @@ def get_star_frequencies(lender, review_id):
     return in_order
 
 def parse_reviews(reviews, star_rating):
-
+    '''
+    Get list of all populated review objects given review tags and star rating.
+    '''
     objects = []
 
     for review in reviews:
@@ -113,12 +150,19 @@ def parse_reviews(reviews, star_rating):
 
 # Not writing unit tests for this one
 def get_tags_of_selector_from_response(response, selector):
+    '''
+    Given response and CSS selector, parse the response contents and return
+    tags.
+    '''
     soup = BeautifulSoup(response.content, 'html.parser')
     return soup.select(selector)
 
 # Probably won't get to unit testing this one because I'm not sure how to
 # create a future without just calling executor thread map
 def get_flattened_reviews_from_futures(futures):
+    '''
+    Flatten futures into format that is returned in JSON.
+    '''
     objects_ag = [x for sublist in futures for x in sublist]
 
     flattened_reviews = [x for sublist in objects_ag for x in sublist]
@@ -143,7 +187,10 @@ def execute_request(url):
 # Not writing unit tests for this one
 def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
 
-    # helpful: https://www.hackerearth.com/practice/python/functional-programming/higher-order-functions-and-decorators/tutorial/
+    '''
+    Closure for allowing one to call the execute function with the parent arguments
+    in the context of the thread map executor.
+    '''
 
     url_prefix = construct_url_prefix(lender, review_id, star_rating)
 

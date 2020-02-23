@@ -1,6 +1,7 @@
 import unittest
-from reviews_utils import populate_review_fields, construct_url_prefix, parse_reviews, reviews_are_equal
-from reviews_utils import get_star_frequencies
+# Importing a lot from reviews_utils, don't want to use wildcard (*) imports
+from reviews_utils import populate_review_fields, construct_url_prefix, parse_reviews
+from reviews_utils import get_page_limits, reviews_are_equal
 import bs4
 from bs4 import BeautifulSoup
 
@@ -68,12 +69,12 @@ class TestStringMethods(unittest.TestCase):
       output_1 = populate_review_fields(review_1_as_soup, 5)
 
       self.assertTrue('value' in output_1)
-      self.assertTrue('name' in output_1)
+      self.assertTrue('author' in output_1)
       self.assertTrue('title' in output_1)
       self.assertTrue('date' in output_1)
       self.assertTrue('stars' in output_1)
       self.assertEqual(output_1['date'], "Reviewed in February 2020")
-      self.assertEqual(output_1['name'], "Richard's")
+      self.assertEqual(output_1['author'], "Richard's")
       self.assertEqual(output_1['title'], "Excellent Customer Service")
       self.assertEqual(output_1['value'], "Kara at Wyndham Capitol is the Queen of Refi. If your looking for great service and a easy hassle free refi or new home loan look no further!")
       self.assertEqual(output_1['stars'], 5)
@@ -108,12 +109,12 @@ class TestStringMethods(unittest.TestCase):
       output_2 = populate_review_fields(review_2_as_soup, 3)
 
       self.assertTrue('value' in output_2)
-      self.assertTrue('name' in output_2)
+      self.assertTrue('author' in output_2)
       self.assertTrue('title' in output_2)
       self.assertTrue('date' in output_2)
       self.assertTrue('stars' in output_2)
       self.assertEqual(output_2['date'], "Reviewed in April 2019")
-      self.assertEqual(output_2['name'], "John Doe")
+      self.assertEqual(output_2['author'], "John Doe")
       self.assertEqual(output_2['title'], "Lorem ipsum")
       self.assertEqual(output_2['value'], "Its was easy to do, he agent was very helpful and the money was there the next morning so that was a big help")
       self.assertEqual(output_2['stars'], 3)
@@ -122,8 +123,8 @@ class TestStringMethods(unittest.TestCase):
       review_1 = {}
       review_2 = {}
 
-      review_1["name"] = "Adam"
-      review_2["name"] = "Adam"
+      review_1["author"] = "Adam"
+      review_2["author"] = "Adam"
 
       review_1["title"] = "The title"
       review_2["title"] = "The title"
@@ -145,8 +146,8 @@ class TestStringMethods(unittest.TestCase):
       review_1 = {}
       review_2 = {}
 
-      review_1["name"] = "Adam"
-      review_2["name"] = "Adam"
+      review_1["author"] = "Adam"
+      review_2["author"] = "Adam"
 
       review_1["title"] = "The title"
       review_2["title"] = "The title"
@@ -164,13 +165,13 @@ class TestStringMethods(unittest.TestCase):
 
       self.assertFalse(bool_1)
 
-    def test_get_star_frequencies_1(self):
-      output_1 = get_star_frequencies('upstart-network-inc', 54350158)
+    def test_get_page_limits(self):
+      output_1 = get_page_limits('upstart-network-inc', 54350158)
 
       self.assertEqual([4, 2, 2, 5, 145], output_1)
 
-    def test_get_star_frequencies_2(self):
-      output_2 = get_star_frequencies('cashnetusa', 81638970)
+    def test_get_page_limits_2(self):
+      output_2 = get_page_limits('cashnetusa', 81638970)
 
       self.assertEqual([2, 2, 4, 18, 155], output_2)
 

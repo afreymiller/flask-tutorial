@@ -1,7 +1,8 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-from reviews_utils import populate_review_fields, get_star_frequencies, execute_thread_pool
+# Importing a lot from reviews_utils, don't want to use wildcard (*) imports
+from reviews_utils import populate_review_fields, get_page_limits, execute_thread_pool
 from reviews_utils import construct_url_prefix, parse_reviews, get_flattened_reviews_from_futures
 from reviews_utils import reviews_are_equal, execute_request, get_response_closure
 import threading 
@@ -13,17 +14,9 @@ from bs4 import BeautifulSoup, Tag
 
 app = Flask(__name__)
 
-# Docs: https://flask.palletsprojects.com/en/1.1.x/
+# Run using command `env FLASK_APP=main.py flask run`
 
-# env FLASK_APP=main.py flask run
-
-# http://127.0.0.1:5000/reviews/upstart-network-inc/54350158
-
-# http://127.0.0.1:5000/reviews/cashnetusa/81638970
-
-# https://www.lendingtree.com/reviews/personal/upstart-network-inc/54350158
-
-# https://www.lendingtree.com/reviews/personal/cashnetusa/81638970
+# Example request: http://127.0.0.1:5000/reviews/upstart-network-inc/54350158
 
 @app.route('/')
 def index():
@@ -33,11 +26,9 @@ def index():
 def get_reviews(lender, review_id):
     try: 
        
-        page_counts_per_star = get_star_frequencies(lender, review_id)
+        page_counts_per_star = get_page_limits(lender, review_id)
 
         closures = [get_response_closure(lender, review_id, page_counts_per_star[x], x+1) for x in range(5)]
-
-        # https://gist.github.com/mangecoeur/9540178
 
         futures = execute_thread_pool(closures, page_counts_per_star)
 
