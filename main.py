@@ -1,7 +1,8 @@
 from flask import Flask, jsonify
 from markupsafe import escape
 import requests
-from review_field_utils import populate_review_fields, get_star_frequencies, execute_thread_pool, construct_url_prefix, parse_reviews, get_reviews_from_response
+from review_field_utils import populate_review_fields, get_star_frequencies, execute_thread_pool
+from review_field_utils import construct_url_prefix, parse_reviews, get_flattened_reviews_from_futures, get_reviews_from_response
 import threading 
 import concurrent.futures
 import bs4
@@ -28,7 +29,7 @@ def index():
 def execute_request(url):
     return requests.get(url)
 
-def get_response(lender, review_id, star_rating):
+def get_response_closure(lender, review_id, star_rating):
 
     # helpful: https://www.hackerearth.com/practice/python/functional-programming/higher-order-functions-and-decorators/tutorial/
 
@@ -37,8 +38,13 @@ def get_response(lender, review_id, star_rating):
     def execute(page_index):
         url = url_prefix + '&pid=' + str(page_index)
         response = execute_request(url)
-        reviews = get_reviews_from_response(response)
-        objects = parse_reviews(reviews, star_rating)
+
+        objects = []
+
+        if response.status_code >= 200 or respose.status_code <= 299:
+            reviews = get_reviews_from_response(response)
+            objects = parse_reviews(reviews, star_rating)
+
         return objects
     
     return execute
@@ -48,18 +54,13 @@ def get_reviews(lender, review_id):
     try: 
         page_counts_per_star = get_star_frequencies(lender, review_id)
 
-        closures = [get_response(lender, review_id, x) for x in range(1, 6)]
+        closures = [get_response_closure(lender, review_id, x) for x in range(1, 6)]
 
         # https://gist.github.com/mangecoeur/9540178
 
         futures = execute_thread_pool(closures, page_counts_per_star)
 
-        # Should the following lines be part of the thread pool executor?
-        objects_ag = [x for sublist in futures for x in sublist]
-        flattened = [x for sublist in objects_ag for x in sublist]
-
-        #if (response.status_code < 200 or response.status_code > 299):
-        #    return "Did not get successful response: " + str(response.status_code) 
+        flattened = get_flattened_reviews_from_futures(futures)
 
         print(len(flattened))
 

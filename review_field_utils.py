@@ -6,6 +6,7 @@ import math
 import threading 
 import concurrent.futures
 
+# Added positive unit tests, will add some more negative ones
 def populate_review_fields(review, star_rating):
     # These should ideally come from either a database or parameter store, 
     # but for the purposes of this exercise I'll leave them here for now.
@@ -26,12 +27,11 @@ def populate_review_fields(review, star_rating):
 
     obj = {}
 
-    # Get rid of breaks from in here. Needs to be unit test around this 
-
     for field in field_dependencies: 
         element = review.select(field['selector'])
         value = element[0]
 
+        # Checking for type of Tag due to one edge case related to <br/> tags found
         text = [x for x in value.contents if type(x) != Tag]
 
         obj[field['key']] = text[0].strip()
@@ -40,6 +40,7 @@ def populate_review_fields(review, star_rating):
 
     return obj
 
+# Probably won't get to unit testing this one before the deadline
 def execute_thread_pool(closures, page_counts_per_star):
     futures = []
 
@@ -50,25 +51,16 @@ def execute_thread_pool(closures, page_counts_per_star):
 
     return futures
 
-def dummy():
-    test_string = '''<p class="reviewText"><br/>Its was easy to do,
-    he agent was very helpful and the money was there the next morning so that was a big help<br/></p>'''                                             
+# Probably won't get to unit testing this one because I'm not sure how to
+# create a future without just calling executor thread map
+def get_flattened_reviews_from_futures(futures):
+    objects_ag = [x for sublist in futures for x in sublist]
 
-    soup = BeautifulSoup(test_string, 'html.parser')                                                         
+    flattened_reviews = [x for sublist in objects_ag for x in sublist]
 
-    print(soup.contents)
-    print(soup.contents[0])
+    return flattened_reviews
 
-    element = soup.select('.reviewText')
-
-    print(element)
-
-    print(element[0].contents) 
-
-    print(elem for elem in element[0].children)
-
-
-
+# Unit testing complete
 def construct_url_prefix(lender, review_id, star_rating):
     try:
         id_as_int = int(review_id)
@@ -109,8 +101,6 @@ def get_star_frequencies(lender, review_id):
 
     soup = BeautifulSoup(response.content, 'html.parser')   
     star_count = soup.select(".review-count-text")
-
-    # Maybe use ::-1 here
 
     star_frequencies = []
             
