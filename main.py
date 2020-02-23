@@ -3,7 +3,7 @@ from markupsafe import escape
 import requests
 from reviews_utils import populate_review_fields, get_star_frequencies, execute_thread_pool
 from reviews_utils import construct_url_prefix, parse_reviews, get_flattened_reviews_from_futures
-from reviews_utils import get_reviews_from_response, reviews_are_equal, execute_request, get_response_closure
+from reviews_utils import reviews_are_equal, execute_request, get_response_closure
 import threading 
 import concurrent.futures
 import bs4
@@ -32,6 +32,7 @@ def index():
 @app.route('/reviews/<lender>/<int:review_id>')
 def get_reviews(lender, review_id):
     try: 
+       
         page_counts_per_star = get_star_frequencies(lender, review_id)
 
         closures = [get_response_closure(lender, review_id, page_counts_per_star[x], x+1) for x in range(5)]

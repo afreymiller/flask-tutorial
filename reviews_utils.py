@@ -9,6 +9,7 @@ import concurrent.futures
 
 # Added positive unit tests, will add some more negative ones
 def populate_review_fields(review, star_rating):
+
     # These should ideally come from either a database or parameter store, 
     # but for the purposes of this exercise I'll leave them here for now.
     field_dependencies = [{
@@ -51,26 +52,6 @@ def reviews_are_equal(review_1, review_2):
 
     return are_equal
 
-# Probably won't get to unit testing this one before the deadline
-def execute_thread_pool(closures, page_counts_per_star):
-    futures = []
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        for index, closure in enumerate(closures):
-            future = executor.map(closure, range(page_counts_per_star[index]))
-            futures.append(future)
-
-    return futures
-
-# Probably won't get to unit testing this one because I'm not sure how to
-# create a future without just calling executor thread map
-def get_flattened_reviews_from_futures(futures):
-    objects_ag = [x for sublist in futures for x in sublist]
-
-    flattened_reviews = [x for sublist in objects_ag for x in sublist]
-
-    return flattened_reviews
-
 # Unit testing complete
 def construct_url_prefix(lender, review_id, star_rating):
     try:
@@ -100,23 +81,16 @@ def construct_url_prefix(lender, review_id, star_rating):
     except RuntimeError:
         raise RuntimeError("Lender must be non-null")
 
-# not unit testing this one unless I have extra time at the end
-def get_reviews_from_response(response):
-    soup = BeautifulSoup(response.content, 'html.parser')   
-    reviews = soup.select(".reviewDetail")
-    return reviews
-
 def get_star_frequencies(lender, review_id):
     url = construct_url_prefix(lender, review_id, 5)
-    response = requests.get(url)
+    response = execute_request(url)
 
-    soup = BeautifulSoup(response.content, 'html.parser')   
-    star_count = soup.select(".review-count-text")
+    star_counts = get_tags_of_selector_from_response(response, ".review-count-text")
 
     star_frequencies = []
             
     # make this more readable
-    for frequency in star_count:
+    for frequency in star_counts:
         freq_as_int = int(re.sub(r'[\(\)]', '', frequency.contents[0]))
         page_count = (math.ceil(freq_as_int/10)) + 1
         star_frequencies.append(page_count)
@@ -135,11 +109,36 @@ def parse_reviews(reviews, star_rating):
 
     return objects
 
-# I'm not testing this one
+# Not writing unit tests for this one
+def get_tags_of_selector_from_response(response, selector):
+    soup = BeautifulSoup(response.content, 'html.parser')
+    return soup.select(selector)
+
+# Probably won't get to unit testing this one because I'm not sure how to
+# create a future without just calling executor thread map
+def get_flattened_reviews_from_futures(futures):
+    objects_ag = [x for sublist in futures for x in sublist]
+
+    flattened_reviews = [x for sublist in objects_ag for x in sublist]
+
+    return flattened_reviews
+
+# Probably won't get to unit testing this one before the deadline
+def execute_thread_pool(closures, page_counts_per_star):
+    futures = []
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for index, closure in enumerate(closures):
+            future = executor.map(closure, range(page_counts_per_star[index]))
+            futures.append(future)
+
+    return futures
+
+# Not writing unit tests for this one
 def execute_request(url):
     return requests.get(url)
 
-# I'm not testing this one
+# Not writing unit tests for this one
 def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
 
     # helpful: https://www.hackerearth.com/practice/python/functional-programming/higher-order-functions-and-decorators/tutorial/
@@ -159,7 +158,7 @@ def get_response_closure(lender, review_id, page_limit_for_star, star_rating):
         objects = []
 
         if response.status_code >= 200 or respose.status_code <= 299:
-            reviews = get_reviews_from_response(response)
+            reviews = get_tags_of_selector_from_response(response, '.reviewDetail')
             objects = parse_reviews(reviews, star_rating)
 
         return objects
