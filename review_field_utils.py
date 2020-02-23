@@ -50,7 +50,7 @@ def dummy():
 
 
 
-def construct_url(lender, review_id, star_rating, page):
+def construct_url_prefix(lender, review_id, star_rating):
     try:
         id_as_int = int(review_id)
 
@@ -63,11 +63,11 @@ def construct_url(lender, review_id, star_rating, page):
         lender = lender.strip()
 
         URL_PREFIX = "https://www.lendingtree.com/reviews/personal/"
-        full_url = URL_PREFIX + lender
-        full_url += "/"
-        full_url += str(review_id)
-        full_url += f'?OverallRating={star_rating}&pid={page}'
-        return full_url
+        url = URL_PREFIX + lender
+        url += "/"
+        url += str(review_id)
+        url += f'?OverallRating={star_rating}' #&pid={page}'
+        return url
 
     except ValueError:
         raise ValueError("review_id should be a non-negative integer.")
