@@ -38,8 +38,13 @@ def get_response(lender, review_id, star_rating):
     def execute(page_index):
         url = url_prefix + '&pid=' + str(page_index)
         response = execute_request(url)
-        reviews = get_reviews_from_response(response)
-        objects = parse_reviews(reviews, star_rating)
+
+        objects = []
+
+        if response.status_code >= 200 or respose.status_code <= 299:
+            reviews = get_reviews_from_response(response)
+            objects = parse_reviews(reviews, star_rating)
+
         return objects
     
     return execute
@@ -56,9 +61,6 @@ def get_reviews(lender, review_id):
         futures = execute_thread_pool(closures, page_counts_per_star)
 
         flattened = get_flattened_reviews_from_futures(futures)
-
-        #if (response.status_code < 200 or response.status_code > 299):
-        #    return "Did not get successful response: " + str(response.status_code) 
 
         print(len(flattened))
 
