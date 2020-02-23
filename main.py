@@ -28,8 +28,10 @@ def get_response(lender, review_id, star_rating):
 
     def execute(page_index):
         url = url_prefix + '&pid=' + str(page_index)
-        print(url)
-        return execute_request(url)
+        response = execute_request(url)
+        reviews = get_reviews_from_response(response)
+        objects = parse_reviews(reviews)
+        return objects
     
     return execute
 
@@ -39,34 +41,18 @@ def get_reviews(lender, review_id):
         #page_index = 1
         #url = construct_url(lender, review_id, 5, page_index)
         #response = requests.get(url)
-        responses = []
+        objects_agg = []
         closure = get_response(lender, review_id, 5)
 
         #while (response.status_code >= 200 and response.status_code <= 299):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.map(closure, range(200))
-            responses = [x for x in future]
-
-        # while (page_index < 15):
-        #     responses.append(response)
-        #     page_index += 1
-        #     url = construct_url(lender, review_id, 4, page_index)
-        #     print(page_index)
-        #     response = requests.get(url)
-
-        print(len(responses))
-        print(responses)
+            objects_agg = [x for sublist in future for x in sublist]
 
         #if (response.status_code < 200 or response.status_code > 299):
         #    return "Did not get successful response: " + str(response.status_code) 
 
-        objects_aggregated = []
-        for response in responses:
-            reviews = get_reviews_from_response(response)
-            objects = parse_reviews(reviews)
-            objects_aggregated.append(objects)
-        print(len(objects_aggregated))
-        return jsonify(reviews=objects_aggregated)
+        return jsonify(reviews=objects_agg)
     except ValueError:
         return "Input for review_id should be a non-negative integer"
     except AttributeError:
