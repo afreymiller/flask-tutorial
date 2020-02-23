@@ -1,7 +1,9 @@
 import bs4
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
-def populate_review_fields(review):
+def populate_review_fields(review, star_rating):
+    # These should ideally come from either a database or parameter store, 
+    # but for the purposes of this exercise I'll leave them here for now.
     field_dependencies = [{
             "selector": ".reviewText",
             "key": "value"
@@ -19,17 +21,45 @@ def populate_review_fields(review):
 
     obj = {}
 
+    # Get rid of breaks from in here. Needs to be unit test around this 
+
     for field in field_dependencies: 
         element = review.select(field['selector'])
         value = element[0]
-        obj[field['key']] = value.contents[0].strip()
+
+        text = [x for x in value.contents if type(x) != Tag]
+
+        obj[field['key']] = text[0].strip()
+
+    obj['stars'] = star_rating
 
     return obj
 
-def construct_url(lender, review_id):
+def dummy():
+    test_string = '''<p class="reviewText"><br/>Its was easy to do,
+    he agent was very helpful and the money was there the next morning so that was a big help<br/></p>'''                                             
+
+    soup = BeautifulSoup(test_string, 'html.parser')                                                         
+
+    print(soup.contents)
+    print(soup.contents[0])
+
+    element = soup.select('.reviewText')
+
+    print(element)
+
+    print(element[0].contents) 
+
+    print(elem for elem in element[0].children)
+
+
+
+def construct_url_prefix(lender, review_id, star_rating):
     try:
         id_as_int = int(review_id)
 
+        # From observations, pretty sure flask's routing already throws 
+        # an error for negative values but just in case...
         if (id_as_int < 0):
             raise ValueError("review_id should be a non-negative integer.")
 
@@ -39,11 +69,11 @@ def construct_url(lender, review_id):
         lender = lender.strip()
 
         URL_PREFIX = "https://www.lendingtree.com/reviews/personal/"
-        full_url = URL_PREFIX + lender
-        full_url += "/"
-        full_url += str(review_id)
-        full_url += "?OverallRating=1&pid=1"
-        return full_url
+        url = URL_PREFIX + lender
+        url += "/"
+        url += str(review_id)
+        url += f'?OverallRating={star_rating}' #&pid={page}'
+        return url
 
     except ValueError:
         raise ValueError("review_id should be a non-negative integer.")
@@ -58,31 +88,12 @@ def get_reviews_from_response(response):
     reviews = soup.select(".reviewDetail")
     return reviews
 
-def parse_reviews(reviews):
+def parse_reviews(reviews, star_rating):
 
     objects = []
 
     for review in reviews:
-        obj = populate_review_fields(review)
+        obj = populate_review_fields(review, star_rating)
         objects.append(obj)
 
     return objects
-
-def exception_parent(string):
-    try:
-        exception_child(string)
-    except RuntimeError:
-        raise RuntimeError("nullity")
-    except:
-        raise Exception("generic exception")
-
-def exception_child(string):
-    try: 
-        if (len(string) <= 0):
-            raise RuntimeError("Null string")
-        else:
-            return string
-    except RuntimeError:
-        raise RuntimeError("the string was null")
-    except ValueError:
-        raise ValueError("this was the one")
