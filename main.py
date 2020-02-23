@@ -38,9 +38,6 @@ def get_response(lender, review_id, star_rating):
 @app.route('/reviews/<lender>/<int:review_id>')
 def get_reviews(lender, review_id):
     try: 
-        #page_index = 1
-        #url = construct_url(lender, review_id, 5, page_index)
-        #response = requests.get(url)
         objects_ag = []
         flattened = []
         closures = [get_response(lender, review_id, x) for x in range(1, 6)]
